@@ -17,4 +17,5 @@ private:
 
     CNFDefine strip_header();
     static CNFDefine parse_header(const std::string& s);
+    static void parse_weights(const std::string& s, std::vector<size_t> &in_weights);
 };

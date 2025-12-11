@@ -1,14 +1,14 @@
 #pragma once
 
 #include <cstddef>
-#include <cmath>
 
 struct Literal {
 public:
+    Literal(long int in_l, size_t in_w);
+    
     size_t id;
-    Literal(long int in_l);
-
     bool as_is;
+    size_t weight;
 
     bool operator<(const Literal & other) const;
     bool operator>(const Literal & other) const;

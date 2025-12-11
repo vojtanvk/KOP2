@@ -4,6 +4,7 @@
 #include <cstring>
 #include <cassert>
 #include <sstream>
+#include <vector>
 
 CNFFileParser::CNFFileParser(const std::string &in_filename) {
     file = std::ifstream(in_filename, file.in);
@@ -13,6 +14,13 @@ CNFFileParser::~CNFFileParser() { file.close(); }
 CNFDefine CNFFileParser::fill_formula(Formula & to_fill) {
     // Strip header
     auto define = strip_header();
+    std::vector<size_t> weights{};
+    weights.resize(define.number_of_literals);
+
+    char s[200];
+    file.getline(s, 200);
+    CNFFileParser::parse_weights(s,weights);
+    file.getline(s, 200);
 
     // Fill formula with clauses
     size_t clause_cnt = 0;
@@ -31,7 +39,7 @@ CNFDefine CNFFileParser::fill_formula(Formula & to_fill) {
 
         if(id) {
             // std::cout << "Adding literal " << id << " to current clause.\n";
-            lits.push_back(Literal{id});
+            lits.push_back(Literal{id, weights[std::abs(id)-1]});
             // std::cout << "Current clause literals: ";
             // for(const auto & l : lits) {
             //     std::cout << (l.as_is ? "" : "-") << l.id << " ";
@@ -71,9 +79,10 @@ CNFDefine CNFFileParser::parse_header(const std::string & s) {
     // Line should look like 
     // p cnf <number_of_literals> <number_of_clauses>
 
-    assert(strncmp("p cnf", s.data(), 5) == 0);
+    std::string def_prefix{"p mwcnf"};
+    assert(strncmp(def_prefix.data(), s.data(), def_prefix.size()) == 0);
 
-    std::istringstream is{s.substr(5, s.size())};
+    std::istringstream is{s.substr(def_prefix.size(), s.size())};
 
     CNFDefine out{};
     is >> out.number_of_literals >> out.number_of_clauses;
@@ -81,3 +90,11 @@ CNFDefine CNFFileParser::parse_header(const std::string & s) {
     return out;
 }
 
+void CNFFileParser::parse_weights(const std::string & s, std::vector<size_t> & in_weights) {
+    std::string w_prefix{"w"};
+    assert(strncmp(w_prefix.data(), s.data(), w_prefix.size()) == 0);
+    std::istringstream is{s.substr(w_prefix.size(), s.size())};
+    for(auto & w : in_weights){
+        is >> w;
+    }
+}

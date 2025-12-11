@@ -2,7 +2,7 @@
 cmake_minimum_required(VERSION 3.28)
 
 project(
-  prob_sat
+  annealer_sim
   VERSION 0.1
   LANGUAGES CXX
   )
@@ -21,7 +21,7 @@ target_sources(${PROJECT_NAME} PRIVATE
 
 add_subdirectory(cnf_parser)
 add_subdirectory(cnf_structs)
-add_subdirectory(solver)
+add_subdirectory(annealer)
 add_subdirectory(rng_wrapper)
 target_link_libraries(${PROJECT_NAME} PUBLIC
   cnf_structs

@@ -31,5 +31,5 @@ std::vector<Literal> Clause::get_literals() const {
 }
 
 bool Clause::contains_literal(size_t lit_idx) const {
-    return data.contains(Literal(static_cast<long int>(lit_idx+1)));
+    return data.contains(Literal(static_cast<long int>(lit_idx+1), 0));
 }
