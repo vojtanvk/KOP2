@@ -22,6 +22,8 @@ CNFDefine CNFFileParser::fill_formula(Formula & to_fill) {
     CNFFileParser::parse_weights(s,weights);
     file.getline(s, 200);
 
+    define.literal_weights = weights;
+
     // Fill formula with clauses
     size_t clause_cnt = 0;
     std::vector<Literal> lits;
@@ -39,7 +41,7 @@ CNFDefine CNFFileParser::fill_formula(Formula & to_fill) {
 
         if(id) {
             // std::cout << "Adding literal " << id << " to current clause.\n";
-            lits.push_back(Literal{id, weights[std::abs(id)-1]});
+            lits.push_back(Literal{id});
             // std::cout << "Current clause literals: ";
             // for(const auto & l : lits) {
             //     std::cout << (l.as_is ? "" : "-") << l.id << " ";

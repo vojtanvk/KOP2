@@ -6,6 +6,7 @@
 #include <cnf_structs/formula.hpp>
 #include <cnf_parser/cnf_parser.hpp>
 #include <rng_wrapper/rng_wrapper.hpp>
+#include <annealer/annealer.hpp>
 
 std::string get_command(char ** begin, char ** end, const std::string & option)
 {
@@ -25,9 +26,31 @@ int main(int argc, char ** argv) {
         filename = ".data/wuf20-71-M/wuf20-01.mwcnf";
     }
 
+    RNGWrapper rng;
+    auto comm_rng_state = get_command(argv, argv+argc, "-rng_start");
+    if(!comm_rng_state.empty()) {
+        rng.set_start_state(comm_rng_state);
+    }
+
     CNFFileParser parser{filename};
     Formula formula;
     CNFDefine def{parser.fill_formula(formula)};
+
+
+    using namespace Annealer;
+    Assignment assignment(def.number_of_literals, false);
+    init(rng, assignment);
+
+    std::cout << "{";
+    for(size_t i=0; i<assignment.size(); ++i) {
+        std::cout << (int) assignment[i] << "*" << def.literal_weights[i];
+        if(i!=assignment.size()-1) {
+            std::cout << ",";
+        }
+        
+    }
+    std::cout << "} == " << final_score(def.literal_weights, assignment) << std::endl;
+
 
     exit(0);
 }
