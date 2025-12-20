@@ -5,6 +5,7 @@
 
 #include <cnf_structs/formula.hpp>
 #include <cnf_parser/cnf_parser.hpp>
+#include <numeric>
 #include <rng_wrapper/rng_wrapper.hpp>
 #include <annealer/annealer.hpp>
 
@@ -39,26 +40,27 @@ int main(int argc, char ** argv) {
     Formula formula;
     CNFDefine def{parser.fill_formula(formula)};
 
-
-    using namespace Annealer;
-    Assignment assignment(def.number_of_literals, false);
-    init(rng, assignment);
+    Annealer annealer{def};
 
 
-    while(!formula.is_satisfied(assignment)) {
-        assignment = get_neighbour(rng, assignment);
-    }
+    
+    auto final_assignment = annealer.outer_loop(formula);
+
+
 
     // FINAL SCORE PRINTING
+    size_t final_score = 0;
     std::cout << "{";
-    for(size_t i=0; i<assignment.size(); ++i) {
-        std::cout << (int) assignment[i] << "*" << def.denormalized_weights[i];
-        if(i!=assignment.size()-1) {
+    for(size_t i=0; i<final_assignment.size(); ++i) {
+        std::cout << (int) final_assignment[i] << "*" << def.literal_weights[i];
+        if(i!=final_assignment.size()-1) {
             std::cout << ",";
         }
-        
+        if(final_assignment[i]) {
+            final_score += def.literal_weights[i];
+        }
     }
-    std::cout << "} == " << final_score(def.denormalized_weights, assignment) << std::endl;
+    std::cout << "} == " << final_score << std::endl;
 
 
 

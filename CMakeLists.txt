@@ -20,7 +20,7 @@ add_executable(${PROJECT_NAME} main.cpp)
 target_sources(${PROJECT_NAME} PRIVATE 
   main.cpp)
 
-option(DEBUG "Enable debug mode" ON)
+option(DEBUG "Enable debug mode" OFF)
 if(DEBUG)
   add_compile_definitions(${PROJECT_NAME} PRIVATE DEBUG=1)
 else()

@@ -20,5 +20,7 @@ public:
     const std::vector<Clause> & get_clauses_containing_literal(size_t lit_idx) const;
     std::vector<Clause> get_satisfied_clauses(const std::vector<bool> & in_assignment) const;
 
+    size_t count_unsatisfied_clauses(const std::vector<bool> & in_assignment) const;
+
     std::map<size_t, std::vector<Clause>> clauses_by_literal;
 };

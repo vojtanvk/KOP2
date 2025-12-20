@@ -15,8 +15,7 @@ CNFFileParser::~CNFFileParser() { file.close(); }
 CNFDefine CNFFileParser::fill_formula(Formula & to_fill) {
     // Strip header
     auto define = strip_header();
-    define.normalized_weights.resize(define.number_of_literals);
-    define.denormalized_weights.resize(define.number_of_literals);
+    define.literal_weights.resize(define.number_of_literals);
 
     char s[200];
     file.getline(s, 200);
@@ -95,13 +94,7 @@ void CNFFileParser::parse_weights(const std::string & s, CNFDefine & define) {
     std::string w_prefix{"w"};
     assert(strncmp(w_prefix.data(), s.data(), w_prefix.size()) == 0);
     std::istringstream is{s.substr(w_prefix.size(), s.size())};
-    double total_weight = 0.0;
-    for(auto & w : define.denormalized_weights){
+    for(auto & w : define.literal_weights){
         is >> w;
-        total_weight += w;
-    }
-
-    for(size_t i=0; i<define.denormalized_weights.size(); ++i) {
-        define.normalized_weights[i] = define.denormalized_weights[i] / total_weight;
     }
 }

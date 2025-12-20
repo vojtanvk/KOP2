@@ -43,3 +43,13 @@ std::vector<Clause> Formula::get_satisfied_clauses(const std::vector<bool> & in_
     }
     return res;
 }
+
+size_t Formula::count_unsatisfied_clauses(const std::vector<bool> & in_assignment) const {
+    size_t count = 0;
+    for (const auto & c : data) {
+        if (!c.is_satisfied(in_assignment)) {
+            ++count;
+        }
+    }
+    return count;
+}
