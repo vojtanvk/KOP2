@@ -7,13 +7,9 @@
 #include <cstdlib>
 #include <stdexcept>
 #include <iostream>
+#include <cassert>
 
 void RNGWrapper::init() {
-
-	// TODO make this optional and configurable
-	set_seed("rng_wrapper/config/seed");
-	set_start_state("rng_wrapper/config/rng_state");
-
 	// prefer explicit state if provided, else seed
 	if (state_given) {
 		rng_set_state_uint(s1, s2, s3, s4);
@@ -106,7 +102,15 @@ void RNGWrapper::save(const std::string & filename) const {
 	// std::cout << "State saved " << filename << "\n";
 }
 
-float RNGWrapper::get_next() {
+double RNGWrapper::get_next() {
 	double d = rng_next_double();
-	return static_cast<float>(d);
+	return d;
+}
+
+size_t RNGWrapper::get_next_idx(size_t limit) {
+	if constexpr(DEBUG) { 
+		assert(limit>0 && "RNGWrapper::get_next called with limit 0");
+	}
+	unsigned r = rng_next_range(0,limit);
+	return r;
 }

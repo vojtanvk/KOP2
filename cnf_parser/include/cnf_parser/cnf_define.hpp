@@ -6,5 +6,10 @@
 struct CNFDefine {
     size_t number_of_literals;
     size_t number_of_clauses;
-    std::vector<size_t> literal_weights;
+
+    // normalized weights
+    std::vector<double> normalized_weights;
+
+    // denormalized weights
+    std::vector<size_t> denormalized_weights;
 };

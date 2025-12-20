@@ -1,4 +1,5 @@
 #include "include/cnf_parser/cnf_parser.hpp"
+#include "cnf_parser/cnf_define.hpp"
 
 #include <iostream>
 #include <cstring>
@@ -14,15 +15,13 @@ CNFFileParser::~CNFFileParser() { file.close(); }
 CNFDefine CNFFileParser::fill_formula(Formula & to_fill) {
     // Strip header
     auto define = strip_header();
-    std::vector<size_t> weights{};
-    weights.resize(define.number_of_literals);
+    define.normalized_weights.resize(define.number_of_literals);
+    define.denormalized_weights.resize(define.number_of_literals);
 
     char s[200];
     file.getline(s, 200);
-    CNFFileParser::parse_weights(s,weights);
+    CNFFileParser::parse_weights(s,define);
     file.getline(s, 200);
-
-    define.literal_weights = weights;
 
     // Fill formula with clauses
     size_t clause_cnt = 0;
@@ -92,11 +91,17 @@ CNFDefine CNFFileParser::parse_header(const std::string & s) {
     return out;
 }
 
-void CNFFileParser::parse_weights(const std::string & s, std::vector<size_t> & in_weights) {
+void CNFFileParser::parse_weights(const std::string & s, CNFDefine & define) {
     std::string w_prefix{"w"};
     assert(strncmp(w_prefix.data(), s.data(), w_prefix.size()) == 0);
     std::istringstream is{s.substr(w_prefix.size(), s.size())};
-    for(auto & w : in_weights){
+    double total_weight = 0.0;
+    for(auto & w : define.denormalized_weights){
         is >> w;
+        total_weight += w;
+    }
+
+    for(size_t i=0; i<define.denormalized_weights.size(); ++i) {
+        define.normalized_weights[i] = define.denormalized_weights[i] / total_weight;
     }
 }

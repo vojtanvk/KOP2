@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstddef>
 #include <string>
 #include <cstdint>
 
@@ -12,7 +13,8 @@ public:
     void set_start_state(uint64_t in_s1, uint64_t in_s2, uint64_t in_s3, uint64_t in_s4);
 
     void save(const std::string & filename) const;
-    float get_next();
+    double get_next();
+    size_t get_next_idx(size_t limit);
 private:
     // Default values (explicit unsigned long long suffix)
     uint64_t s1{12732784810903672734ULL};

@@ -20,6 +20,9 @@ std::string get_command(char ** begin, char ** end, const std::string & option)
 
 int main(int argc, char ** argv) {
 
+    if constexpr(DEBUG)
+        std::cout << "Just to be clear, DEBUG is ON" << std::endl;
+
     auto filename = get_command(argv, argv+argc, "-file");
     std::cout << filename << std::endl;
     if(filename.empty()) {
@@ -41,15 +44,22 @@ int main(int argc, char ** argv) {
     Assignment assignment(def.number_of_literals, false);
     init(rng, assignment);
 
+
+    while(!formula.is_satisfied(assignment)) {
+        assignment = get_neighbour(rng, assignment);
+    }
+
+    // FINAL SCORE PRINTING
     std::cout << "{";
     for(size_t i=0; i<assignment.size(); ++i) {
-        std::cout << (int) assignment[i] << "*" << def.literal_weights[i];
+        std::cout << (int) assignment[i] << "*" << def.denormalized_weights[i];
         if(i!=assignment.size()-1) {
             std::cout << ",";
         }
         
     }
-    std::cout << "} == " << final_score(def.literal_weights, assignment) << std::endl;
+    std::cout << "} == " << final_score(def.denormalized_weights, assignment) << std::endl;
+
 
 
     exit(0);

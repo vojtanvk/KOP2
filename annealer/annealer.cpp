@@ -1,6 +1,5 @@
 #include "include/annealer/annealer.hpp"
 #include "rng_wrapper/rng_wrapper.hpp"
-#include <utility>
 
 using namespace Annealer;
 
@@ -22,3 +21,11 @@ size_t Annealer::final_score(const std::vector<size_t> & weights, const Assignme
     }   
     return out;
 }
+
+Assignment Annealer::get_neighbour(RNGWrapper & rng, const Assignment& current_assignment) {
+    Assignment neighbour = current_assignment;
+    size_t index = rng.get_next_idx(neighbour.size()-1);
+    neighbour[index] = !neighbour[index];
+    return neighbour;
+}
+
