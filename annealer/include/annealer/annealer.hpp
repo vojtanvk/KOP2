@@ -12,6 +12,12 @@ public:
 
     Annealer(CNFDefine & define);
 
+    Annealer& set_rng_start_state(std::string & state);
+    Annealer& set_initial_temperature(double temp);
+    Annealer& set_cooling_rate(double rate);
+    Annealer& set_inner_loop_iterations(size_t iterations);
+    Annealer& set_min_temperature(double min_temp);
+
     const Assignment & get_current_assignment() const;
 
     Annealer::Assignment outer_loop(const Formula & formula);

@@ -8,7 +8,7 @@
 
 #include <cassert>
 
-Annealer::Annealer(CNFDefine & define) : weights{define.literal_weights}, current_assignment(define.number_of_literals, false), current_score{0.0}, temperature{1000.0}, cooling_rate{0.99}, inner_loop_iterations{100}, min_temperature(1.0), rng{}, best_score(0.0) {
+Annealer::Annealer(CNFDefine & define) : weights{define.literal_weights}, current_assignment(define.number_of_literals, false), temperature{1000.0}, cooling_rate{0.99}, inner_loop_iterations{100}, min_temperature(1.0), rng{} {
     size_t total_weight = std::accumulate(weights.begin(), weights.end(), 0);
     for(const auto & w : weights) {
         normalized_weights.push_back(static_cast<double>(w) / static_cast<double>(total_weight));
@@ -21,6 +21,30 @@ Annealer::Annealer(CNFDefine & define) : weights{define.literal_weights}, curren
     best_score = current_score;
 }
 
+Annealer& Annealer::set_rng_start_state(std::string& state) {
+    rng.set_start_state(state);
+    return *this;   
+}
+
+Annealer& Annealer::set_initial_temperature(double temp) {
+    temperature = temp;
+    return *this;
+}
+Annealer& Annealer::set_cooling_rate(double rate) {
+    assert(rate > 0.0 && rate < 1.0);
+    cooling_rate = rate;
+    return *this;
+}
+Annealer& Annealer::set_inner_loop_iterations(size_t iterations) {
+    inner_loop_iterations = iterations;
+    return *this;
+}
+Annealer& Annealer::set_min_temperature(double min_temp) {
+    assert(min_temp >= 0.0);
+    min_temperature = min_temp;
+    return *this;
+}
+
 void Annealer::generate_assignment() {
     for(size_t i=0; i<current_assignment.size(); ++i) {
         current_assignment[i] = rng.get_next() > 0.5;
@@ -28,6 +52,7 @@ void Annealer::generate_assignment() {
 }
 
 Annealer::Assignment Annealer::outer_loop(const Formula & formula) {
+    assert(min_temperature < temperature);
     while(temperature > min_temperature) {
         if constexpr (DEBUG) {
             std::cout << "Current temperature: " << temperature << "\n";
@@ -91,7 +116,6 @@ double Annealer::evaluate(const Assignment& assignment, const Formula & formula)
     }
     score -= formula.count_unsatisfied_clauses(assignment);
     if constexpr(DEBUG) {
-        std::cout << "Evaluated score: " << score << "\n";
         assert(score <= 1.0 && score >= -static_cast<double>(formula.get_unsatisfied_clauses(assignment).size()));
     }
     return score;
