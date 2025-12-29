@@ -13,6 +13,7 @@ public:
     Annealer(CNFDefine & define);
 
     Annealer& set_rng_start_state(std::string & state);
+    void save_rng_state(const std::string & filename);
     Annealer& set_initial_temperature(double temp);
     Annealer& set_cooling_rate(double rate);
     Annealer& set_inner_loop_iterations(size_t iterations);

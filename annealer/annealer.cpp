@@ -26,6 +26,10 @@ Annealer& Annealer::set_rng_start_state(std::string& state) {
     return *this;   
 }
 
+void Annealer::save_rng_state(const std::string & filename) {
+    rng.save(filename);
+}
+
 Annealer& Annealer::set_initial_temperature(double temp) {
     temperature = temp;
     return *this;

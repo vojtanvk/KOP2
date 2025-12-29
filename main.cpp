@@ -28,13 +28,14 @@ int main(int argc, char ** argv) {
         std::cout << "Just to be clear, DEBUG is ON" << std::endl;
 
     auto filename = get_command(argv, argv+argc, "-file");
-    if constexpr(DEBUG) {
-        std::cout << "Filename set to: " << filename.value() << std::endl;
-    }
     
     if(!filename) {
         filename = std::make_optional(".data/wuf20-71-M/wuf20-01.mwcnf");
     }
+    if constexpr(DEBUG) {
+        std::cout << "Filename set to: " << filename.value() << std::endl;
+    }
+    
 
     CNFFileParser parser{filename.value()};
     Formula formula;
@@ -45,8 +46,13 @@ int main(int argc, char ** argv) {
     
     auto final_assignment = annealer.outer_loop(formula);
 
+    auto rng_save_str = get_command(argv, argv+argc, "-rng_save");
+    if(rng_save_str) {
+        annealer.save_rng_state(rng_save_str.value());
+    }
+
     // FINAL SCORE PRINTING
-    std::cout << filename.value() << " ";
+    // std::cout << filename.value() << " ";
 
     size_t final_score = 0;
     for(size_t i=0; i<final_assignment.size(); ++i) {
