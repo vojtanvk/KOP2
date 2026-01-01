@@ -23,6 +23,10 @@ public:
 
     Annealer::Assignment outer_loop(const Formula & formula);
 
+    if constexpr(CALIBRATE) {
+        double calibrate(const Formula & formula);
+    }
+
 private:
     std::vector<size_t> weights;
 
@@ -40,6 +44,19 @@ private:
     std::vector<double> normalized_weights;
     std::vector<bool> best_assignment;
     double best_score;
+
+    if constexpr(CALIBRATE) {
+        bool initial_temp_set = false;
+        bool cooling_rate_set = false;
+        bool inner_loop_iters_set = false;
+        bool min_temp_set = false;
+        enum class CalibrationValue {
+            INITIAL_TEMPERATURE,
+            COOLING_RATE,
+            INNER_LOOP_ITERATIONS,
+            MIN_TEMPERATURE
+        }
+    }
 
     void inner_loop(const Formula & formula);
 

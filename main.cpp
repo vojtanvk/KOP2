@@ -27,6 +27,9 @@ int main(int argc, char ** argv) {
     if constexpr(DEBUG)
         std::cout << "Just to be clear, DEBUG is ON" << std::endl;
 
+    if constexpr(CALIBRATE)
+        std::cout << "Just to be clear, CALIBRATE is ON" << std::endl;
+
     auto filename = get_command(argv, argv+argc, "-file");
     
     if(!filename) {
@@ -125,5 +128,6 @@ void print_help() {
     std::cout << "  -cooling <value>   Set cooling rate (default: 0.99)\n";
     std::cout << "  -inner_iters <n>   Set number of inner loop iterations (default: 100)\n";
     std::cout << "  -min_temp <value>  Set minimum temperature (default: 1.0)\n";
-    std::cout << "  -rng_start <state> Set RNG start state\n";
+    std::cout << "  -rng_start <file/state> Set RNG start state\n";
+    std::cout << "  -rng_save <file>   Save RNG state to file\n";
 }
