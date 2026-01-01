@@ -71,7 +71,7 @@ void Annealer::inner_loop(const Formula & formula) {
     for(size_t iter=0; iter<inner_loop_iterations; ++iter) {
         auto neighbour = get_neighbour(rng, current_assignment);
         double neighbour_score = evaluate(neighbour, formula);
-        double score_diff = neighbour_score - current_score;
+        double how_much_worse = current_score - neighbour_score;
 
         auto change_assignment = [&](){
             current_assignment = neighbour;
@@ -81,14 +81,20 @@ void Annealer::inner_loop(const Formula & formula) {
             ++iter;
         };
 
-        if(score_diff > 0) {
+        // The neighbour is actually better than current state
+        if(how_much_worse < 0) {
             if(neighbour_score > best_score) {
                 best_assignment = neighbour;
                 best_score = neighbour_score;
             }
             change_assignment();
         } else {
-            double acceptance_prob = std::exp(-score_diff / temperature);
+            // random(0,1) < e^(-δ/T) [δ > 0]
+            // δ -> 0 => e^... -> 1 (0/any -> 0)
+            // δ -> inf => e^... -> 0 (-inf/any -> -inf)
+            // T -> inf => e^... -> 1 (any/inf -> 0)
+            // T -> 0 => e^... -> 0 (-any/0 -> -inf)
+            double acceptance_prob = std::exp(-how_much_worse / temperature);
             if(rng.get_next() < acceptance_prob) {
                 change_assignment();
             }
