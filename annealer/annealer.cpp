@@ -8,7 +8,11 @@
 
 #include <cassert>
 
-Annealer::Annealer(CNFDefine & define) : weights{define.literal_weights}, current_assignment(define.number_of_literals, false), temperature{1000.0}, cooling_rate{0.99}, inner_loop_iterations{100}, min_temperature(1.0), rng{} {
+Annealer::Annealer(CNFDefine & define, const InitialConfig & config) : weights{define.literal_weights}, current_assignment(define.number_of_literals, false), temperature{config.initial_temperature}, cooling_rate{config.cooling_rate}, inner_loop_iterations{config.inner_loop_iterations}, min_temperature(config.min_temperature), rng{} {
+    if(!config.rng_start_state.empty()) {
+        rng.set_start_state(config.rng_start_state);
+    }
+
     size_t total_weight = std::accumulate(weights.begin(), weights.end(), 0);
     for(const auto & w : weights) {
         normalized_weights.push_back(static_cast<double>(w) / static_cast<double>(total_weight));
@@ -58,9 +62,6 @@ void Annealer::generate_assignment() {
 Annealer::Assignment Annealer::outer_loop(const Formula & formula) {
     assert(min_temperature < temperature);
     while(temperature > min_temperature) {
-        if constexpr (DEBUG) {
-            std::cout << "Current temperature: " << temperature << "\n";
-        }
         inner_loop(formula);
         cool();
     }

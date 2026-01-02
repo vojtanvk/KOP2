@@ -14,7 +14,7 @@
 
 std::optional<std::string> get_command(char ** begin, char ** end, const std::string & option);
 void print_help();
-void annealer_setup(Annealer & annealer, char ** begin, char ** end);
+InitialConfig annealer_setup(char ** begin, char ** end);
 
 int main(int argc, char ** argv) {
 
@@ -32,17 +32,14 @@ int main(int argc, char ** argv) {
     if(!filename) {
         filename = std::make_optional(".data/wuf20-71-M/wuf20-01.mwcnf");
     }
-    if constexpr(DEBUG) {
-        std::cout << "Filename set to: " << filename.value() << std::endl;
-    }
     
 
     CNFFileParser parser{filename.value()};
     Formula formula;
     CNFDefine def{parser.fill_formula(formula)};
-
-    Annealer annealer{def};
-    annealer_setup(annealer, argv, argv+argc);
+    
+    auto config = annealer_setup(argv, argv+argc);
+    Annealer annealer{def, config};
     
     auto final_assignment = annealer.outer_loop(formula);
 
@@ -51,9 +48,17 @@ int main(int argc, char ** argv) {
         annealer.save_rng_state(rng_save_str.value());
     }
 
-    // FINAL SCORE PRINTING
-    // std::cout << filename.value() << " ";
+    if constexpr (DEBUG) {
+        std::cout << "DEBUG: Input file: " << filename.value() << "\n";
+        std::cout << "DEBUG: Input parameters:\n";
+        std::cout << "  Initial temperature: " << config.initial_temperature << "\n";
+        std::cout << "  Cooling rate: " << config.cooling_rate << "\n";
+        std::cout << "  Inner loop iterations: " << config.inner_loop_iterations << "\n";
+        std::cout << "  Minimum temperature: " << config.min_temperature << "\n";
+        std::cout << "-- End of input parameters --\n";
+    }
 
+    // FINAL SCORE PRINTING
     size_t final_score = 0;
     for(size_t i=0; i<final_assignment.size(); ++i) {
         if(final_assignment[i]) {
@@ -69,41 +74,43 @@ int main(int argc, char ** argv) {
             std::cout << " " << static_cast<int>(-(i+1));
         }
     }
-    std::cout << std::endl;
+    std::cout << " 0" << std::endl;
 
 
     exit(0);
 }
 
-void annealer_setup(Annealer & annealer, char ** begin, char ** end) {
+InitialConfig annealer_setup(char ** begin, char ** end) {
+    InitialConfig config;
     auto rng_state_str = get_command(begin, end, "-rng_start");
     if(rng_state_str) {
-        annealer.set_rng_start_state(rng_state_str.value());
+        config.rng_start_state = rng_state_str.value();
     }
 
     auto temp_str = get_command(begin, end, "-temp");
     if(temp_str) {
         double temp = std::stod(temp_str.value());
-        annealer.set_initial_temperature(temp);
+        config.initial_temperature = temp;
     }
 
     auto cooling_str = get_command(begin, end, "-cooling");
     if(cooling_str) {
         double cooling = std::stod(cooling_str.value());
-        annealer.set_cooling_rate(cooling);
+        config.cooling_rate = cooling;
     }
 
     auto inner_iter_str = get_command(begin, end, "-inner_iters");
     if(inner_iter_str) {
         size_t inner_iters = std::stoul(inner_iter_str.value());
-        annealer.set_inner_loop_iterations(inner_iters);
+        config.inner_loop_iterations = inner_iters;
     }
 
     auto min_temp_str = get_command(begin, end, "-min_temp");
     if(min_temp_str) {
         double min_temp = std::stod(min_temp_str.value());
-        annealer.set_min_temperature(min_temp);
+        config.min_temperature = min_temp;
     }
+    return config;
 }
 
 std::optional<std::string> get_command(char ** begin, char ** end, const std::string & option)

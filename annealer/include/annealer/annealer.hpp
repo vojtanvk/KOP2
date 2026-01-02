@@ -3,6 +3,7 @@
 #include <cnf_structs/formula.hpp>
 #include <rng_wrapper/rng_wrapper.hpp>
 #include <cnf_parser/cnf_define.hpp>
+#include "initial_config.hpp"
 
 #include <vector>
 
@@ -10,7 +11,7 @@ class Annealer {
 public:
     using Assignment = std::vector<bool>;
 
-    Annealer(CNFDefine & define);
+    Annealer(CNFDefine & define, const InitialConfig & config);
 
     Annealer& set_rng_start_state(std::string & state);
     void save_rng_state(const std::string & filename);
