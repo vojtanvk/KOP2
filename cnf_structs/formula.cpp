@@ -53,3 +53,13 @@ size_t Formula::count_unsatisfied_clauses(const std::vector<bool> & in_assignmen
     }
     return count;
 }
+
+size_t Formula::most_clauses_per_literal() const {
+    size_t max_clauses = 0;
+    for(const auto & [lit_idx, clauses] : clauses_by_literal) {
+        if(clauses.size() > max_clauses) {
+            max_clauses = clauses.size();
+        }
+    }
+    return max_clauses;
+}

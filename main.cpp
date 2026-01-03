@@ -14,7 +14,7 @@
 
 std::optional<std::string> get_command(char ** begin, char ** end, const std::string & option);
 void print_help();
-InitialConfig annealer_setup(char ** begin, char ** end);
+void annealer_setup(char ** begin, char ** end, InitialConfig & config);
 
 int main(int argc, char ** argv) {
 
@@ -38,7 +38,8 @@ int main(int argc, char ** argv) {
     Formula formula;
     CNFDefine def{parser.fill_formula(formula)};
     
-    auto config = annealer_setup(argv, argv+argc);
+    InitialConfig config{formula};
+    annealer_setup(argv, argv+argc, config);
     Annealer annealer{def, config};
     
     auto final_assignment = annealer.outer_loop(formula);
@@ -80,8 +81,7 @@ int main(int argc, char ** argv) {
     exit(0);
 }
 
-InitialConfig annealer_setup(char ** begin, char ** end) {
-    InitialConfig config;
+void annealer_setup(char ** begin, char ** end, InitialConfig & config) {
     auto rng_state_str = get_command(begin, end, "-rng_start");
     if(rng_state_str) {
         config.rng_start_state = rng_state_str.value();
@@ -110,15 +110,18 @@ InitialConfig annealer_setup(char ** begin, char ** end) {
         double min_temp = std::stod(min_temp_str.value());
         config.min_temperature = min_temp;
     }
-    return config;
 }
 
 std::optional<std::string> get_command(char ** begin, char ** end, const std::string & option)
 {
     char ** itr = std::find(begin, end, option);
-    if (itr != end && ++itr != end)
-    {
-        return {*itr};
+    if(itr != end) {
+        if (++itr != end)
+        {
+            return {*itr};
+        }
+        // retrieved option has no value but is present
+        return {""};
     }
     return std::nullopt;
 }

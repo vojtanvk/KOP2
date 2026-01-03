@@ -21,6 +21,7 @@ public:
     std::vector<Clause> get_satisfied_clauses(const std::vector<bool> & in_assignment) const;
 
     size_t count_unsatisfied_clauses(const std::vector<bool> & in_assignment) const;
+    size_t most_clauses_per_literal() const;
 
     std::map<size_t, std::vector<Clause>> clauses_by_literal;
 };
