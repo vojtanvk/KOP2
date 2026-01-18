@@ -9,3 +9,8 @@ struct InitialConfig {
     size_t inner_loop_iterations;
     double min_temperature;
 };
+
+struct Statistic {
+    double temperature;
+    size_t cycles;
+};

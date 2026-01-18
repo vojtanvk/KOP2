@@ -7,6 +7,7 @@
 #include <numeric>
 
 #include <cassert>
+#include <iostream>
 
 Annealer::Annealer(CNFDefine & define, const InitialConfig & config) : weights{define.literal_weights}, current_assignment(define.number_of_literals, false), temperature{config.initial_temperature}, cooling_rate{config.cooling_rate}, inner_loop_iterations{config.inner_loop_iterations}, min_temperature(config.min_temperature), rng{} {
     if(!config.rng_start_state.empty()) {
@@ -70,6 +71,10 @@ Annealer::Assignment Annealer::outer_loop(const Formula & formula) {
 
 void Annealer::inner_loop(const Formula & formula) {
     for(size_t iter=0; iter<inner_loop_iterations; ++iter) {
+#if DEBUG || CALIBRATION
+        ++cycles;
+#endif
+
         auto neighbour = get_neighbour(rng, current_assignment);
         double neighbour_score = evaluate(neighbour, formula);
         double how_much_worse = current_score - neighbour_score;
@@ -87,6 +92,14 @@ void Annealer::inner_loop(const Formula & formula) {
             if(neighbour_score > best_score) {
                 best_assignment = neighbour;
                 best_score = neighbour_score;
+                #if DEBUG || CALIBRATION
+                stat.temperature = temperature;
+                stat.cycles = cycles;
+
+                if constexpr(DEBUG) {
+                    std::cout << "DEBUG: New best found at " << stat.temperature << "° after " << stat.cycles << " cycles." << std::endl; 
+                }
+                #endif
             }
             change_assignment();
         } else {

@@ -27,6 +27,13 @@ else()
   add_compile_definitions(${PROJECT_NAME} PRIVATE DEBUG=0)
 endif()
 
+option(CALIBRATION "Enable calibration mode" OFF)
+if(CALIBRATION)
+  add_compile_definitions(${PROJECT_NAME} PRIVATE CALIBRATION=1)
+else()
+  add_compile_definitions(${PROJECT_NAME} PRIVATE CALIBRATION=0)
+endif()
+
 add_subdirectory(cnf_parser)
 add_subdirectory(cnf_structs)
 add_subdirectory(annealer)

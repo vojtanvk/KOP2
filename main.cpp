@@ -59,6 +59,10 @@ int main(int argc, char ** argv) {
         std::cout << "-- End of input parameters --\n";
     }
 
+    if constexpr (CALIBRATION) {
+        std::cout << "CALIBRATION: temperature,cycles: " << annealer.stat.temperature << "," << annealer.stat.cycles << "\n";
+    }
+
     // FINAL SCORE PRINTING
     size_t final_score = 0;
     for(size_t i=0; i<final_assignment.size(); ++i) {
@@ -131,9 +135,10 @@ void print_help() {
     std::cout << "Options:\n";
     std::cout << "  -h                 Show this help message\n";
     std::cout << "  -file <filename>   Specify the input CNF file\n";
-    std::cout << "  -temp <value>      Set initial temperature (default: 1000.0)\n";
+    std::cout << "  -temp <value>      Set initial temperature (default: based on 'most active' literal)\n";
     std::cout << "  -cooling <value>   Set cooling rate (default: 0.99)\n";
     std::cout << "  -inner_iters <n>   Set number of inner loop iterations (default: 100)\n";
     std::cout << "  -min_temp <value>  Set minimum temperature (default: 1.0)\n";
-    std::cout << "  -rng_start <state> Set RNG start state\n";
+    std::cout << "  -rng_start <state_in> Set RNG start state\n";
+    std::cout << "  -rng_save <state_out> Where RNG state will be saved\n";
 }

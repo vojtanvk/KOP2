@@ -3,7 +3,7 @@
 #include <cnf_structs/formula.hpp>
 #include <rng_wrapper/rng_wrapper.hpp>
 #include <cnf_parser/cnf_define.hpp>
-#include "initial_config.hpp"
+#include "utils.hpp"
 
 #include <vector>
 
@@ -23,6 +23,11 @@ public:
     const Assignment & get_current_assignment() const;
 
     Annealer::Assignment outer_loop(const Formula & formula);
+
+    #if DEBUG || CALIBRATION
+    Statistic stat{-1,0};
+    size_t cycles{0};
+    #endif
 
 private:
     std::vector<size_t> weights;
@@ -49,4 +54,6 @@ private:
     Assignment get_neighbour(RNGWrapper & rng, const Assignment& current_assignment);
     double evaluate(const Assignment& assignment, const Formula & formula) const;
     void generate_assignment();
+
+    
 };
