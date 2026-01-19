@@ -63,6 +63,7 @@ int main(int argc, char ** argv) {
         std::cout << "CALIBRATION: temperature,cycles: " << annealer.stat.temperature << "," << annealer.stat.cycles << "\n";
     }
 
+
     // FINAL SCORE PRINTING
     size_t final_score = 0;
     for(size_t i=0; i<final_assignment.size(); ++i) {
@@ -70,6 +71,14 @@ int main(int argc, char ** argv) {
             final_score += def.literal_weights[i];
         }
     }
+    
+    if(!formula.is_satisfied(final_assignment)) {
+        final_score = 0;
+        if constexpr (DEBUG) {
+            std::cout << "DEBUG: Final assignment DOES NOT satisfy the formula.\n";
+        }
+    }
+
     std::cout << final_score;
 
     for(size_t i=0; i<final_assignment.size(); ++i) {
