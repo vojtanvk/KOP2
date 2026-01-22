@@ -11,7 +11,7 @@ class Annealer {
 public:
     using Assignment = std::vector<bool>;
 
-    Annealer(CNFDefine & define, const InitialConfig & config);
+    Annealer(CNFDefine & define, const InitialConfig & config, const Formula & formula);
 
     Annealer& set_rng_start_state(std::string & state);
     void save_rng_state(const std::string & filename);

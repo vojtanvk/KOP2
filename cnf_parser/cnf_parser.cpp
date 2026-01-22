@@ -17,10 +17,10 @@ CNFDefine CNFFileParser::fill_formula(Formula & to_fill) {
     auto define = strip_header();
     define.literal_weights.resize(define.number_of_literals);
 
-    char s[200];
-    file.getline(s, 200);
+    char s[500];
+    file.getline(s, 500);
     CNFFileParser::parse_weights(s,define);
-    file.getline(s, 200);
+    file.getline(s, 500);
 
     // Fill formula with clauses
     size_t clause_cnt = 0;
@@ -61,15 +61,18 @@ CNFDefine CNFFileParser::fill_formula(Formula & to_fill) {
         }
     }
 
+    if constexpr (DEBUG) {
+        std::cout << "DEBUG: Parsed " << clause_cnt << " clauses. Expected: " << define.number_of_clauses << std::endl;
+    }
     assert(clause_cnt == define.number_of_clauses);
     return define;
 }
 
 CNFDefine CNFFileParser::strip_header() {
     char c = 0;
-    char s[200];
+    char s[500];
     while(file.good() && c != 'p') {
-        file.getline(s, 200);
+        file.getline(s, 500);
         c = s[0];
     }
     return parse_header(s);

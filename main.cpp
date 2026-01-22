@@ -40,7 +40,7 @@ int main(int argc, char ** argv) {
     
     InitialConfig config{formula};
     annealer_setup(argv, argv+argc, config);
-    Annealer annealer{def, config};
+    Annealer annealer{def, config, formula};
     
     auto final_assignment = annealer.outer_loop(formula);
 

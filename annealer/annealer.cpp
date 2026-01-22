@@ -9,7 +9,7 @@
 #include <cassert>
 #include <iostream>
 
-Annealer::Annealer(CNFDefine & define, const InitialConfig & config) : weights{define.literal_weights}, current_assignment(define.number_of_literals, false), temperature{config.initial_temperature}, cooling_rate{config.cooling_rate}, inner_loop_iterations{config.inner_loop_iterations}, min_temperature(config.min_temperature), rng{} {
+Annealer::Annealer(CNFDefine & define, const InitialConfig & config, const Formula & formula) : weights{define.literal_weights}, current_assignment(define.number_of_literals, false), temperature{config.initial_temperature}, cooling_rate{config.cooling_rate}, inner_loop_iterations{config.inner_loop_iterations}, min_temperature(config.min_temperature), rng{} {
     if(!config.rng_start_state.empty()) {
         rng.set_start_state(config.rng_start_state);
     }
@@ -21,7 +21,7 @@ Annealer::Annealer(CNFDefine & define, const InitialConfig & config) : weights{d
     rng.init();
     generate_assignment();
 
-    current_score = evaluate(current_assignment, Formula{});
+    current_score = evaluate(current_assignment, formula);
     best_assignment = current_assignment;
     best_score = current_score;
 }
@@ -97,7 +97,7 @@ void Annealer::inner_loop(const Formula & formula) {
                 stat.cycles = cycles;
 
                 if constexpr(DEBUG) {
-                    std::cout << "DEBUG: New best found at " << stat.temperature << "° after " << stat.cycles << " cycles." << std::endl; 
+                    std::cout << "DEBUG: New best found at " << stat.temperature << "° after " << stat.cycles << " cycles with a score of " << best_score << "." << std::endl; 
                 }
                 #endif
             }
