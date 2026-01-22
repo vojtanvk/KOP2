@@ -60,7 +60,7 @@ int main(int argc, char ** argv) {
     }
 
     if constexpr (CALIBRATION) {
-        std::cout << "CALIBRATION: temperature,cycles: " << annealer.stat.temperature << "," << annealer.stat.cycles << "\n";
+        std::cout << "CALIBRATION: temperature,cycles,total_cycles: " << annealer.stat.temperature << "," << annealer.stat.cycles << "," << annealer.cycles << "\n";
     }
 
 

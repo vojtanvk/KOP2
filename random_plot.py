@@ -13,7 +13,7 @@ def main():
     # 2. Load the data
     try:
         # Assumes comma-separated, no header row
-        df = pd.read_csv(args.input_file, names=['temperature', 'cycles', 'success'])
+        df = pd.read_csv(args.input_file, names=['temperature', 'cycles', 'total_cycles', 'success'])
         
         if df.empty:
             print("Error: The file is empty.")
@@ -22,12 +22,14 @@ def main():
         # 3. Calculate Statistics
         avg_cycles = df['cycles'].mean()
         avg_temp = df['temperature'].mean()
+        avg_total_cycles = df['total_cycles'].mean()
         success_rate = df['success'].mean()
         
         print(f"\n--- Statistics for: {args.input_file} ---")
         print(f"Total Runs: {len(df)}")
         print(f"Mean Cycles: {avg_cycles:.2f}")
         print(f"Mean Temp:   {avg_temp:.4f}")
+        print(f"Mean Total Cycles: {avg_total_cycles:.2f}")
         print(f"Success Rate: {success_rate*100:.2f}%\n")
 
         # 4. Visualization
