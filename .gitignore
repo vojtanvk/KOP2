@@ -5,3 +5,4 @@ build
 *.zip
 .venv
 calibs
+opt

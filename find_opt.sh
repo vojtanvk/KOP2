@@ -7,7 +7,7 @@ for path in "$dir"/*.mwcnf; do
         path_base=$(basename $path)
         path_clean=${path_base:0:-6}
 
-        dst=opt/"$dir"
+        dst=opt/$(basename "$dir")
         mkdir -p "$dst"
         cp rng_state "$dst"/rng-"$path_clean"
         
@@ -27,5 +27,5 @@ for path in "$dir"/*.mwcnf; do
         done
 
         rm -fr $my_rng
-    ) &
+    ) 
 done
