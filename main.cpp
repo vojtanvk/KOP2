@@ -47,6 +47,11 @@ int main(int argc, char ** argv) {
         confidence = std::stod(confidence_str.value());
     }
 
+    if(confidence <= 0.0 || confidence >= 1.0) {
+        std::cerr << "Error: Confidence must be in the range (0, 1).\n";
+        exit(1);
+    }
+
     size_t repetitions = static_cast<size_t>(std::ceil(std::log(1.0 - confidence) / std::log(1-measured_performance.at(def.number_of_literals).probability)));
     
     InitialConfig config = measured_performance.at(def.number_of_literals).config;
