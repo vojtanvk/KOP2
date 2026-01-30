@@ -12,15 +12,17 @@ CNFFileParser::CNFFileParser(const std::string &in_filename) {
 }
 CNFFileParser::~CNFFileParser() { file.close(); }
 
+static constexpr size_t buffer_size = 1024;
+
 CNFDefine CNFFileParser::fill_formula(Formula & to_fill) {
     // Strip header
     auto define = strip_header();
     define.literal_weights.resize(define.number_of_literals);
 
-    char s[500];
-    file.getline(s, 500);
+    char s[buffer_size];
+    file.getline(s, buffer_size);
     CNFFileParser::parse_weights(s,define);
-    file.getline(s, 500);
+    file.getline(s, buffer_size);
 
     // Fill formula with clauses
     size_t clause_cnt = 0;
@@ -70,9 +72,9 @@ CNFDefine CNFFileParser::fill_formula(Formula & to_fill) {
 
 CNFDefine CNFFileParser::strip_header() {
     char c = 0;
-    char s[500];
+    char s[buffer_size];
     while(file.good() && c != 'p') {
-        file.getline(s, 500);
+        file.getline(s, buffer_size);
         c = s[0];
     }
     return parse_header(s);

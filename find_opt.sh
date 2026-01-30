@@ -18,14 +18,15 @@ for path in "$dir"/*.mwcnf; do
         echo $path
 
         for _ in $(seq 0 70); do
-            output=$(./build/annealer_sim -file $path -rng_start $my_rng -temp 10 -inner_iters 500 -cooling 0.9 -min_temp 0.05 | tail -n 1)
+            output=$(./build/annealer_sim -file $path -rng_start $my_rng -rng_save $my_rng -temp 10 -inner_iters 500 -cooling 0.9 -min_temp 0.05 | tail -n 1)
             found_opt=$(echo $output | cut -d' ' -f1)
 
             if [ $opt -lt $found_opt ]; then
+                opt=$found_opt
                 echo $output > $dst/$path_clean
             fi
         done
 
         rm -fr $my_rng
-    ) 
+    ) &
 done

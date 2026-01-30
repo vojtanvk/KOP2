@@ -33,7 +33,6 @@ int main(int argc, char ** argv) {
         filename = std::make_optional(".data/wuf20-71-M/wuf20-01.mwcnf");
     }
     
-
     CNFFileParser parser{filename.value()};
     Formula formula;
     CNFDefine def{parser.fill_formula(formula)};
