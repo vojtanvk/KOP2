@@ -60,9 +60,17 @@ int main(int argc, char ** argv) {
 
     size_t best_score=0;
     auto best_assignment = std::vector<bool>(def.number_of_literals, false);
-    size_t last_checkpoint = 0;
 
     Annealer annealer{def, config, formula};
+
+    size_t optimal_value = std::numeric_limits<size_t>::max();
+    if constexpr (CALIBRATION) {
+        auto opt_str = get_command(argv, argv+argc, "-opt");
+        if(opt_str) {
+            optimal_value = std::stoul(opt_str.value());
+            std::cout << "CALIBRATION MODE: Optimal solution value set to " << optimal_value << "\n";
+        }
+    }
 
     for(size_t rep = 0; rep < repetitions; ++rep) {
         
@@ -80,7 +88,12 @@ int main(int argc, char ** argv) {
         if(final_score >= best_score) {
             best_score = final_score;
             best_assignment = final_assignment;
-            last_checkpoint = rep;
+            if(best_score >= optimal_value) {
+                if constexpr (CALIBRATION) {
+                    std::cout << "CALIBRATION MODE: Optimal solution reached at repetition " << rep << "\n";
+                }
+                break;
+            }
         }
     }
 
@@ -98,11 +111,6 @@ int main(int argc, char ** argv) {
         std::cout << "  Minimum temperature: " << config.min_temperature << "\n";
         std::cout << "  Repetitions: " << repetitions << "\n";
         std::cout << "-- End of input parameters --\n";
-    }
-
-    if constexpr (CALIBRATION) {
-        std::cout << "CALIBRATION MODE: Best score found: " << best_score << "\n";
-        std::cout << "Last checkpoint at repetition: " << last_checkpoint << "\n";
     }
     
     if(!formula.is_satisfied(best_assignment)) {
@@ -185,4 +193,13 @@ void print_help() {
     std::cout << "  -min_temp <value>  Set minimum temperature\n";
     std::cout << "  -rng_start <state_in> Set RNG start state\n";
     std::cout << "  -rng_save <state_out> Where RNG state will be saved\n";
+    if constexpr (CALIBRATION) {
+        std::cout << "\n ---------------------- CALIBRATION MODE --------------------- \n";
+        std::cout << "  Note: The annealer is compiled in CALIBRATION mode.\n";
+        std::cout << "        The output will include additional debug information.\n";
+        std::cout << " ---------------- Additional calibration options -------------- \n";
+        std::cout << " -opt <value>      Set the optimal solution value for calibration\n";
+        std::cout << " ------------------------------------------------------------- \n";
+    }
+    std::cout << "\n ------------------------------------------------------------- \n";
 }
