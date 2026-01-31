@@ -42,7 +42,7 @@ int main(int argc, char ** argv) {
 
     
     auto confidence_str = get_command(argv, argv+argc, "-confidence");
-    double confidence = 0.95;
+    double confidence = measured_confidence.at(def.number_of_literals);
     if(confidence_str) {
         confidence = std::stod(confidence_str.value());
     }
@@ -90,7 +90,7 @@ int main(int argc, char ** argv) {
             best_assignment = final_assignment;
             if(best_score >= optimal_value) {
                 if constexpr (CALIBRATION) {
-                    std::cout << "CALIBRATION MODE: Optimal solution reached at repetition " << rep << "\n";
+                    std::cout << "CALIBRATION: reps_done/total: " << rep << " / " << repetitions << "\n";
                 }
                 break;
             }
