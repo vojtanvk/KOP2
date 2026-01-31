@@ -229,7 +229,11 @@ unsigned rng_to_range (unsigned low, unsigned high, double val) {
 }
 
 unsigned rng_next_range (unsigned low, unsigned high) {
-    return round (rng_next_double() * (high-low+1) - 0.5 + low);
+	auto next_val = rng_next_double();
+	auto out = round (next_val * (high-low+1) - 0.5 + low); 
+	if(out < low) out = low;
+	if(out > high) out = high;
+    return out;	
 }
 /*---------------------------------------------------------------------------*/
 /* Fisher-Yates shuffle, aka Knuth shuffle 				     */
