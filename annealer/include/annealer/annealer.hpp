@@ -11,9 +11,10 @@ class Annealer {
 public:
     using Assignment = std::vector<bool>;
 
-    Annealer(CNFDefine & define, const InitialConfig & config, const Formula & formula);
+    Annealer(CNFDefine & define, const Formula & formula);
 
     Annealer& set_rng_start_state(std::string & state);
+    Annealer& configure(const InitialConfig & config);
     void save_rng_state(const std::string & filename);
     Annealer& set_initial_temperature(double temp);
     Annealer& set_cooling_rate(double rate);

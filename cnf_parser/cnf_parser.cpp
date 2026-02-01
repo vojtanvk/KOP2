@@ -21,6 +21,9 @@ CNFDefine CNFFileParser::fill_formula(Formula & to_fill) {
 
     char s[buffer_size];
     file.getline(s, buffer_size);
+    while(s[0] != 'w') {
+        file.getline(s, buffer_size);
+    }
     CNFFileParser::parse_weights(s,define);
     file.getline(s, buffer_size);
 

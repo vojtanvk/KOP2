@@ -5,7 +5,6 @@ struct InitialConfig {
     size_t inner_loop_iterations;
     double min_temperature;
     double cooling_rate;
-    std::string rng_start_state="";
 };
 
 struct Statistic {

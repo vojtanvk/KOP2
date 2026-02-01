@@ -61,7 +61,13 @@ int main(int argc, char ** argv) {
     size_t best_score=0;
     auto best_assignment = std::vector<bool>(def.number_of_literals, false);
 
-    Annealer annealer{def, config, formula};
+    Annealer annealer{def, formula};
+
+
+    auto rng_state_str = get_command(argv, argv+argc, "-rng_start");
+    if(rng_state_str) {
+        annealer.set_rng_start_state(rng_state_str.value());
+    }
 
     size_t optimal_value = std::numeric_limits<size_t>::max();
     if constexpr (CALIBRATION) {
@@ -72,16 +78,22 @@ int main(int argc, char ** argv) {
         }
     }
 
-    for(size_t rep = 0; rep < repetitions; ++rep) {
+    
+
+    
+    size_t rep = 0;
+    for(; rep < repetitions; ++rep) {
         
-        annealer=Annealer{def, config, formula};
+        annealer.configure(config);
 
         auto final_assignment = annealer.outer_loop(formula);
+        
         size_t final_score = 0;
-
-        for(size_t i=0; i<final_assignment.size(); ++i) {
-            if(final_assignment[i]) {
-                final_score += def.literal_weights[i];
+        if(formula.is_satisfied(final_assignment)) {
+            for(size_t i=0; i<final_assignment.size(); ++i) {
+                if(final_assignment[i]) {
+                    final_score += def.literal_weights[i];
+                }
             }
         }
 
@@ -89,9 +101,7 @@ int main(int argc, char ** argv) {
             best_score = final_score;
             best_assignment = final_assignment;
             if(best_score >= optimal_value) {
-                if constexpr (CALIBRATION) {
-                    std::cout << "CALIBRATION: reps_done/total: " << rep << " / " << repetitions << "\n";
-                }
+                               
                 break;
             }
         }
@@ -101,6 +111,7 @@ int main(int argc, char ** argv) {
     if(rng_save_str) {
         annealer.save_rng_state(rng_save_str.value());
     }
+    
 
     if constexpr (DEBUG) {
         std::cout << "DEBUG: Input file: " << filename.value() << "\n";
@@ -113,14 +124,18 @@ int main(int argc, char ** argv) {
         std::cout << "-- End of input parameters --\n";
     }
     
+    if constexpr (CALIBRATION) {
+        std::cout << "CALIBRATION: reps_done/total " << rep << " / " << repetitions << "\n";
+    }
+
     if(!formula.is_satisfied(best_assignment)) {
-        best_score = 0;
+        std::cout << "-1"; // Indicate that the formula is not satisfied
         if constexpr (DEBUG) {
             std::cout << "DEBUG: best assignment DOES NOT satisfy the formula.\n";
         }
+    } else {
+        std::cout << best_score;
     }
-
-    std::cout << best_score;
 
     for(size_t i=0; i<best_assignment.size(); ++i) {
         if(best_assignment[i]) {
@@ -136,11 +151,6 @@ int main(int argc, char ** argv) {
 }
 
 void annealer_setup(char ** begin, char ** end, InitialConfig & config) {
-    auto rng_state_str = get_command(begin, end, "-rng_start");
-    if(rng_state_str) {
-        config.rng_start_state = rng_state_str.value();
-    }
-
     auto temp_str = get_command(begin, end, "-temp");
     if(temp_str) {
         double temp = std::stod(temp_str.value());

@@ -9,16 +9,11 @@
 #include <cassert>
 #include <iostream>
 
-Annealer::Annealer(CNFDefine & define, const InitialConfig & config, const Formula & formula) : weights{define.literal_weights}, current_assignment(define.number_of_literals, false), temperature{config.initial_temperature}, cooling_rate{config.cooling_rate}, inner_loop_iterations{config.inner_loop_iterations}, min_temperature(config.min_temperature), rng{} {
-    if(!config.rng_start_state.empty()) {
-        rng.set_start_state(config.rng_start_state);
-    }
-
+Annealer::Annealer(CNFDefine & define, const Formula & formula) : weights{define.literal_weights}, current_assignment(define.number_of_literals, false) {
     size_t total_weight = std::accumulate(weights.begin(), weights.end(), 0);
     for(const auto & w : weights) {
         normalized_weights.push_back(static_cast<double>(w) / static_cast<double>(total_weight));
     }
-    rng.init();
     generate_assignment();
 
     current_score = evaluate(current_assignment, formula);
@@ -28,7 +23,16 @@ Annealer::Annealer(CNFDefine & define, const InitialConfig & config, const Formu
 
 Annealer& Annealer::set_rng_start_state(std::string& state) {
     rng.set_start_state(state);
+    rng.init();
     return *this;   
+}
+
+Annealer& Annealer::configure(const InitialConfig & config) {
+    set_initial_temperature(config.initial_temperature);
+    set_cooling_rate(config.cooling_rate);
+    set_inner_loop_iterations(config.inner_loop_iterations);
+    set_min_temperature(config.min_temperature);
+    return *this;
 }
 
 void Annealer::save_rng_state(const std::string & filename) {
@@ -126,7 +130,8 @@ const Annealer::Assignment & Annealer::get_current_assignment() const {
 
 Annealer::Assignment Annealer::get_neighbour(RNGWrapper & rng, const Assignment& current_assignment) {
     Assignment neighbour = current_assignment;
-    size_t index = rng.get_next_idx(neighbour.size()-1);
+    auto limit = neighbour.size()-1;
+    size_t index = rng.get_next_idx(limit);
     neighbour[index] = !neighbour[index];
     return neighbour;
 }
